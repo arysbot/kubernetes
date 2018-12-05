@@ -1,0 +1,51 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: shard-orchestrator
+  labels:
+    app: shard-orchestrator
+  namespace: arys-${ENV}
+spec:
+  selector:
+    app: shard-orchestrator
+  ports:
+    - name: gRPC communication
+      protocol: TCP
+      port: 8901
+      targetPort: 8901
+    - name: discord API
+      protocol: TPC
+      port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shard-orchestrator
+  namespace: arys-${ENV}
+  labels:
+    app: shard-orchestrator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shard-orchestrator
+  template:
+    metadata:
+      name: shard-orchestrator
+      labels:
+        app: shard-orchestrator
+    spec:
+      containers:
+        - name: shard-orchestrator
+          image: arysbot/shard-orchestrator
+          env:
+            - name: GRPC_URL
+              value: ""
+          ports:
+            - name: gRPC communication
+              protocol: TCP
+              containerPort: 8901
+            - name: discord API
+              protocol: TPC
+              containerPort: 80
